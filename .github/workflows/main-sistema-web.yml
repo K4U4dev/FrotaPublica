@@ -28,7 +28,7 @@ jobs:
       with:
         files: '${{env.work-directory}}/appsettings.json'
       env:
-        ConnectionStrings.FrotaDatabase: ${{ secrets.CONNECTION_STRING }}
+        ConnectionStrings.FrotaDatabase: ${{ Secrets-Deploy.CONNECTION_STRING }}
 
     - name: Restore dependencies
       run: |
@@ -48,9 +48,9 @@ jobs:
     - name: Upload via FTP
       uses: SamKirkland/FTP-Deploy-Action@4.3.0
       with:
-        server: ${{ secrets.FTP_SERVER }} 
-        username: ${{ secrets.FTP_USER_WEB }} 
-        password: ${{ secrets.FTP_PASS_WEB }} 
+        server: ${{ Secrets-Deploy.FTP_SERVER }} 
+        username: ${{ Secrets-Deploy.FTP_USER_WEB }} 
+        password: ${{ Secrets-Deploy.FTP_PASS_WEB }} 
         local-dir: '${{env.work-directory}}/frotaweb/' 
         server-dir: 'frotaweb'
         exclude: |
