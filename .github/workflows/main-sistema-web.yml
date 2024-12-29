@@ -9,7 +9,7 @@ jobs:
     runs-on: ubuntu-latest
 
     environment:
-      name: production 
+      name: ${{ github.event.inputs.environment }} 
 
     env:
       work-directory: Codigo/Frota/FrotaWeb
