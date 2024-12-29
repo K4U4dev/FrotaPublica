@@ -52,7 +52,7 @@ jobs:
         username: ${{ secrets.FTP_USER_WEB }}
         password: ${{ secrets.FTP_PASS_WEB }}
         local-dir: '${{env.work-directory}}/frotaweb/'  
-        server-dir: '/'  
+        server-dir: ./  
         exclude: |
           **/.git*
           **/.git*/**
