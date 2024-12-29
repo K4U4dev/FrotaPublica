@@ -49,8 +49,8 @@ jobs:
       uses: SamKirkland/FTP-Deploy-Action@4.3.0
       with:
         server: 'win8184.site4now.net'
-        username: ${{ secrets.FTP_USER_WEB }}  
-        password: ${{ secrets.FTP_PASS_WEB }}  
+        username: 'k4u4dev' 
+        password: 'SmartDeployk4u402'
         local-dir: '${{env.work-directory}}/frotaweb/'  
         server-dir: 'frotaweb'  
         exclude: |
