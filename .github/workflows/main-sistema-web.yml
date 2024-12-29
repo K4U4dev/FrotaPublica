@@ -21,7 +21,7 @@ jobs:
     - name: Setup .NET version
       uses: actions/setup-dotnet@v1
       with:
-        dotnet-version: 8.0
+        dotnet-version: '8.0.x'
       
     - name: Replace variables in appsettings.json
       uses: microsoft/variable-substitution@v1
