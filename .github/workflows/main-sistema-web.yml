@@ -52,7 +52,7 @@ jobs:
         username: 'k4u4dev' 
         password: 'SmartDeployk4u402'
         local-dir: '${{env.work-directory}}/frotaweb/'  
-        server-dir: 'frotaweb/'  
+        server-dir: './'  
         exclude: |
           **/.git*
           **/.git*/**
