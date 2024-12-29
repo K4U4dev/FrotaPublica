@@ -48,11 +48,11 @@ jobs:
     - name: Upload via FTP
       uses: SamKirkland/FTP-Deploy-Action@4.3.0
       with:
-        server: ${{ secrets.FTP_SERVER }}
-        username: ${{ secrets.FTP_USER_WEB }}
-        password: ${{ secrets.FTP_PASS_WEB }}
-        local-dir: '${{env.work-directory}}/frotaweb/'
-        remote-dir: './frotaweb'
+        server: ${{ secrets.FTP_SERVER }} 
+        username: ${{ secrets.FTP_USER_WEB }} 
+        password: ${{ secrets.FTP_PASS_WEB }} 
+        local-dir: '${{env.work-directory}}/frotaweb/' 
+        server-dir: 'frotaweb'
         exclude: |
           **/.git*
           **/.git*/**
