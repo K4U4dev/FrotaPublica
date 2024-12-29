@@ -48,9 +48,9 @@ jobs:
     - name: Upload via FTP
       uses: SamKirkland/FTP-Deploy-Action@4.3.0
       with:
-        server: 'win8184.site4now.net'
-        username: 'k4u4dev' 
-        password: 'SmartDeployk4u402'
+        server: ${{ secrets.FTP_SERVER }}
+        username: ${{ secrets.FTP_USER_WEB }}
+        password: ${{ secrets.FTP_PASS_WEB }}
         local-dir: '${{env.work-directory}}/frotaweb/'  
         server-dir: '/'  
         exclude: |
