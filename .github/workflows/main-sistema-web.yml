@@ -1,38 +1,34 @@
 name: Frota-WEB CI
 
 on:
-  workflow_dispatch:
-    inputs:
-      environment:
-        description: 'Environment to deploy'
-        type: environment
-        required: true
+  release:
+    types: [published] 
 
 jobs:
   build-and-publish:
     runs-on: ubuntu-latest
-    
+
     environment:
-      name: ${{ github.event.inputs.environment }}
-    
+      name: production 
+
     env:
       work-directory: Codigo/Frota/FrotaWeb
 
     steps:
-    - name: Execute checkout in repository
+    - name: Checkout code
       uses: actions/checkout@v2
     
-    - name: Configure .NET version
+    - name: Setup .NET version
       uses: actions/setup-dotnet@v1
       with:
         dotnet-version: 8.0
       
-    - name: Replace variables
+    - name: Replace variables in appsettings.json
       uses: microsoft/variable-substitution@v1
       with:
         files: '${{env.work-directory}}/appsettings.json'
       env:
-        ConnectionStrings.MySqlConnection: ${{secrets.CONNECTION_STRING}}
+        ConnectionStrings.FrotaDatabase: ${{ secrets.CONNECTION_STRING }}
 
     - name: Restore dependencies
       run: |
@@ -47,7 +43,7 @@ jobs:
     - name: Publish Application
       run: |
         cd ${{env.work-directory}}
-        dotnet publish -c --configuration Release --no-restore --output ./publishWEB
+        dotnet publish --configuration Release --no-restore --output ./publishWEB
     
     - name: Upload via FTP
       uses: SamKirkland/FTP-Deploy-Action@4.3.0
