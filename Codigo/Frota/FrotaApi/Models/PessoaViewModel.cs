@@ -2,7 +2,7 @@
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 
-namespace FrotaWeb.Models
+namespace FrotaApi.Models
 {
     public class PessoaViewModel
     {
@@ -55,7 +55,6 @@ namespace FrotaWeb.Models
         [Required(ErrorMessage = "O {0} é obrigatório")]
         [DisplayName("Campo Ativo")]
         public sbyte Ativo { get; set; }
-        public string StatusAtivo { get; set; }
 
     }
 }

@@ -35,6 +35,13 @@ namespace FrotaWeb
 			builder.Services.AddTransient<IManutencaoPecaInsumoService, ManutencaoPecaInsumoService>();
             builder.Services.AddHttpContextAccessor();
 
+            builder.Services.AddSession(options =>
+            {
+                options.IdleTimeout = TimeSpan.FromMinutes(30);
+                options.Cookie.HttpOnly = true;
+                options.Cookie.IsEssential = true;
+            });
+
             builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
 			var connectionString = builder.Configuration.GetConnectionString("FrotaDatabase");
@@ -102,6 +109,8 @@ namespace FrotaWeb
 			app.UseStaticFiles();
 
 			app.UseRouting();
+
+			app.UseSession();
 
 			app.UseAuthentication();
 			app.UseAuthorization();
