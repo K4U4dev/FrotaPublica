@@ -43,7 +43,7 @@ jobs:
     - name: Publish Application
       run: |
         cd ${{env.work-directory}}
-        dotnet publish --configuration Release --no-restore --runtime win-x64 --self-contained true --output ./frotaweb
+        dotnet publish --configuration Release --no-restore --output ./frotaweb
     
     - name: Upload via FTP
       uses: SamKirkland/FTP-Deploy-Action@4.3.0
