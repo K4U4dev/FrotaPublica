@@ -33,7 +33,7 @@ jobs:
     - name: Restore dependencies
       run: |
         cd ${{env.work-directory}}
-        dotnet restore
+        dotnet restore --runtime win-x64
 
     - name: Build Application
       run: |
