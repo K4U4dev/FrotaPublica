@@ -43,7 +43,7 @@ jobs:
     - name: Publish Application
       run: |
         cd ${{env.work-directory}}
-        dotnet publish --configuration Release --runtime win-x64 --self-contained true --no-restore --output ./frotaweb
+        dotnet publish --configuration Release --runtime win-x64 --self-contained true --no-restore --output ./frota
     
     - name: Upload via FTP
       uses: SamKirkland/FTP-Deploy-Action@4.3.0
@@ -51,8 +51,8 @@ jobs:
         server: ${{ secrets.FTP_SERVER }}
         username: ${{ secrets.FTP_USER_WEB }}
         password: ${{ secrets.FTP_PASS_WEB }}
-        local-dir: '${{env.work-directory}}/frotaweb/'  
-        server-dir: 'frotaweb/'
+        local-dir: '${{env.work-directory}}/frota/'  
+        server-dir: 'frota/'
         dangerous-clean-slate: true
         exclude: |
           **/.git*
