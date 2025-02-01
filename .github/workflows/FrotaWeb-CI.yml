@@ -34,7 +34,7 @@ jobs:
           ConnectionStrings__DefaultConnection: ${{ secrets.CONNECTION_STRING }}
 
       - name: dotnet publish
-        run: dotnet publish "${{ env.PROJECT_PATH }}" -c Release -o ${{env.DOTNET_ROOT}}/myapp
+        run: dotnet publish "${{ env.PROJECT_PATH }}" -c Release -o ./frota
         env:
           ConnectionStrings__DefaultConnection: ${{ secrets.CONNECTION_STRING }}
 
