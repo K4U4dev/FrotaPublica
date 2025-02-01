@@ -5,8 +5,8 @@ on:
     types: [published]
 
 env:
-  DOTNET_VERSION: '8.0.x'
-  PROJECT_PATH: 'Codigo/Frota/FrotaWeb'
+  DOTNET_VERSION: 8.0.x
+  PROJECT_PATH: Codigo/Frota/FrotaWeb
 
 jobs:
   build-and-deploy:
@@ -44,5 +44,5 @@ jobs:
           server: ${{ secrets.FTP_SERVER }}
           username: ${{ secrets.FTP_USER_WEB }}
           password: ${{ secrets.FTP_PASS_WEB }}
-          local-dir: ${{env.DOTNET_ROOT}}/frota/
+          local-dir: ${{env.PROJECT_PATH}}/frota/
           server-dir: 'frotaweb/'
