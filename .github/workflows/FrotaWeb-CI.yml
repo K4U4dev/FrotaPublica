@@ -35,50 +35,27 @@ jobs:
       run: |
         cd ${{env.work-directory}}
         dotnet restore --runtime win-x64
-
+        
     - name: Build Application
       run: |
         cd ${{env.work-directory}}
-        dotnet build --configuration Release --no-restore
-
+        dotnet build --no-restore --configuration Release
+      
     - name: Publish Application
       run: |
         cd ${{env.work-directory}}
-        dotnet publish --configuration Release --runtime win-x64 --self-contained true --no-restore --output ${{{env.deploy-path}}/
-        cp ${{{env.work-directory}}/bin/Release/netcoreapp8.0/FrotaWeb.exe ${{{env.deploy-path}}/FrotaWeb.exe
-
-    - name: Update web.config
-      run: |
-        sed -i 's/processPath=".*\.dll"/processPath="./FrotaWeb.exe"/g' ${{{env.deploy-path}}/web.config
-
-    - name: Set permissions
-      run: |
-        chmod +x ${{{env.deploy-path}}/FrotaWeb.exe
-        chown -R www-data:www-data ${{{env.deploy-path}}}
-
-    - name: Verify .NET Core installation
-      run: |
-        dotnet --version
-
-    - name: Debug output
-      run: |
-        echo "Current directory: $(pwd)"
-        ls -la ${{{env.deploy-path}}/
-        ./${{{env.deploy-path}}}/FrotaWeb.exe --help
-
+        dotnet publish --configuration Release --runtime win-x64 --self-contained true --no-restore --output ./frota
+    
     - name: Upload via FTP
       uses: SamKirkland/FTP-Deploy-Action@4.3.0
       with:
         server: ${{ secrets.FTP_SERVER }}
         username: ${{ secrets.FTP_USER_WEB }}
         password: ${{ secrets.FTP_PASS_WEB }}
-        local-dir: '${{{env.deploy-path}}}'
+        local-dir: '${{env.work-directory}}/frota/'  
         server-dir: 'frotaweb/'
         dangerous-clean-slate: true
         exclude: |
           **/.git*
           **/.git*/**
           **/AnaliseProjeto
-
-    - name: Clean up
-      run: rm -rf ${{{env.deploy-path}}
