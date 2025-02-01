@@ -39,10 +39,15 @@ jobs:
           ConnectionStrings__DefaultConnection: ${{ secrets.CONNECTION_STRING }}
 
       - name: Upload via FTP
-        uses: SamKirkland/FTP-Deploy-Action@v4.3.4
+        uses: SamKirkland/FTP-Deploy-Action@4.3.0
         with:
           server: ${{ secrets.FTP_SERVER }}
           username: ${{ secrets.FTP_USER_WEB }}
           password: ${{ secrets.FTP_PASS_WEB }}
-          local-dir: ${{env.PROJECT_PATH}}/frota/
+          local-dir: '${{env.PROJECT_PATH}}/frota/'
           server-dir: 'frotaweb/'
+          dangerous-clean-slate: true
+          exclude: |
+            **/.git*
+            **/.git*/**
+            **/AnaliseProjeto
