@@ -1,57 +1,47 @@
-name: Frota-WEB CI
+name: Deploy on Release
+
 on:
   release:
     types: [published]
 
+env:
+  DOTNET_VERSION: '8.0.x'
+
 jobs:
-  build-and-publish:
+  build-and-deploy:
     runs-on: windows-latest
-    environment: 
-      name: secrets
-    env:
-      work-directory: Codigo/Frota/FrotaWeb
     
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       
-    - name: Setup .NET version
-      uses: actions/setup-dotnet@v1
-      with:
-        dotnet-version: 8.0.x
-        
-    - name: Replace variables in appsettings.json
-      uses: microsoft/variable-substitution@v1
-      with:
-        files: '${{env.work-directory}}/appsettings.json'
-      env:
-        ConnectionStrings.FrotaDatabase: ${{ secrets.CONNECTION_STRING }}
-        
-    - name: Restore dependencies
-      run: |
-        cd ${{env.work-directory}}
-        dotnet restore
-        
-    - name: Build Application
-      run: |
-        cd ${{env.work-directory}}
-        dotnet build --no-restore
-        
-    - name: Publish Application
-      run: |
-        cd ${{env.work-directory}}
-        dotnet publish --configuration Release --output ./frota --no-self-contained /p:UseAppHost=false
-        
-    - name: Upload via FTP
-      uses: SamKirkland/FTP-Deploy-Action@4.3.0
-      with:
-        server: ${{ secrets.FTP_SERVER }}
-        username: ${{ secrets.FTP_USER_WEB }}
-        password: ${{ secrets.FTP_PASS_WEB }}
-        local-dir: '${{env.work-directory}}/frota/'
-        server-dir: 'frotaweb/'
-        dangerous-clean-slate: true
-        exclude: |
-          **/.git*
-          **/.git*/**
-          **/AnaliseProjeto
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+          
+      - name: Set up dependency caching for faster builds
+        uses: actions/cache@v4
+        with:
+          path: ~/.nuget/packages
+          key: ${{ runner.os }}-nuget-${{ hashFiles('**/*.csproj') }}
+          restore-keys: |
+            ${{ runner.os }}-nuget-
+            
+      - name: Build with dotnet
+        run: dotnet build --configuration Release
+        env:
+          ConnectionStrings__DefaultConnection: ${{ secrets.CONNECTION_STRING }}
+
+      - name: dotnet publish
+        run: dotnet publish -c Release -o ${{env.DOTNET_ROOT}}/myapp
+        env:
+          ConnectionStrings__DefaultConnection: ${{ secrets.CONNECTION_STRING }}
+
+      - name: Upload via FTP
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.4
+        with:
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USER_WEB }}
+          password: ${{ secrets.FTP_PASS_WEB }}
+          local-dir: ${{env.DOTNET_ROOT}}/myapp/
+          server-dir: 'frotaweb/'
