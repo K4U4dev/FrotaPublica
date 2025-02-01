@@ -40,7 +40,7 @@ jobs:
     - name: Publish Application
       run: |
         cd ${{env.work-directory}}
-        dotnet publish --configuration Release --output ./frota
+        dotnet publish --configuration Release --output ./frota --self-contained true --runtime win-x64
         
     - name: Create web.config
       run: |
