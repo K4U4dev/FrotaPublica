@@ -12,6 +12,9 @@ jobs:
   build-and-deploy:
     runs-on: windows-latest
     
+    environment: 
+      name: secrets
+    
     steps:
       - uses: actions/checkout@v4
       
