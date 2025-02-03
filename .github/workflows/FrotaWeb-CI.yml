@@ -1,56 +1,80 @@
-name: Deploy on Release
-
+name: Frota-WEB CI
 on:
   release:
     types: [published]
 
-env:
-  DOTNET_VERSION: 8.0.x
-  PROJECT_PATH: Codigo/Frota/FrotaWeb
-
 jobs:
-  build-and-deploy:
+  build-and-publish:
     runs-on: windows-latest
-    
     environment: 
       name: secrets
+    env:
+      work-directory: Codigo/Frota/FrotaWeb
     
     steps:
-      - uses: actions/checkout@v4
+    - name: Checkout code
+      uses: actions/checkout@v2
       
-      - name: Setup .NET
-        uses: actions/setup-dotnet@v4
-        with:
-          dotnet-version: ${{ env.DOTNET_VERSION }}
-          
-      - name: Set up dependency caching for faster builds
-        uses: actions/cache@v4
-        with:
-          path: ~/.nuget/packages
-          key: ${{ runner.os }}-nuget-${{ hashFiles('**/*.csproj') }}
-          restore-keys: |
-            ${{ runner.os }}-nuget-
-            
-      - name: Build with dotnet
-        run: dotnet build "${{ env.PROJECT_PATH }}" --configuration Release
-        env:
-          ConnectionStrings__DefaultConnection: ${{ secrets.CONNECTION_STRING }}
-
-      - name: dotnet publish
-        run: dotnet publish "${{ env.PROJECT_PATH }}" -c Release -o ./frota
-        env:
-          ConnectionStrings__DefaultConnection: ${{ secrets.CONNECTION_STRING }}
-
-      - name: Upload via FTP
-        uses: SamKirkland/FTP-Deploy-Action@4.3.0
-        with:
-          server: ${{ secrets.FTP_SERVER }}
-          username: ${{ secrets.FTP_USER_WEB }}
-          password: ${{ secrets.FTP_PASS_WEB }}
-          local-dir: '${{env.PROJECT_PATH}}/frota/'
-          server-dir: 'frotaweb/'
-          dangerous-clean-slate: true
-          exclude: |
-            **/.git*
-            **/.git*/**
-            **/AnaliseProjeto
+    - name: Setup .NET version
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: 8.0.x
+        
+    - name: Replace variables in appsettings.json
+      uses: microsoft/variable-substitution@v1
+      with:
+        files: '${{env.work-directory}}/appsettings.json'
+      env:
+        ConnectionStrings.FrotaDatabase: ${{ secrets.CONNECTION_STRING }}
+        
+    - name: Restore dependencies
+      run: |
+        cd ${{env.work-directory}}
+        dotnet restore
+        
+    - name: Build Application
+      run: |
+        cd ${{env.work-directory}}
+        dotnet build --no-restore
+        
+    - name: Publish Application
+      run: |
+        cd ${{env.work-directory}}
+        dotnet publish --configuration Release --output ./frota
+        
+    - name: Create web.config
+      run: |
+        cd ${{env.work-directory}}/frota
+        echo "<?xml version='1.0' encoding='utf-8'?>
+        <configuration>
+          <location path='.' inheritInChildApplications='false'>
+            <system.webServer>
+              <handlers>
+                <add name='aspNetCore' path='*' verb='*' modules='AspNetCoreModuleV2' resourceType='Unspecified' />
+              </handlers>
+              <aspNetCore processPath='dotnet' 
+                        arguments='.\FrotaWeb.dll' 
+                        stdoutLogEnabled='true' 
+                        stdoutLogFile='.\logs\stdout' 
+                        hostingModel='outofprocess'>
+                <environmentVariables>
+                  <environmentVariable name='ASPNETCORE_ENVIRONMENT' value='Production' />
+                </environmentVariables>
+              </aspNetCore>
+            </system.webServer>
+          </location>
+        </configuration>" > web.config
+        
+    - name: Upload via FTP
+      uses: SamKirkland/FTP-Deploy-Action@4.3.0
+      with:
+        server: ${{ secrets.FTP_SERVER }}
+        username: ${{ secrets.FTP_USER_WEB }}
+        password: ${{ secrets.FTP_PASS_WEB }}
+        local-dir: '${{env.work-directory}}/frota/'
+        server-dir: 'frotaweb/'
+        dangerous-clean-slate: true
+        exclude: |
+          **/.git*
+          **/.git*/**
+          **/AnaliseProjeto
