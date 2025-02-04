@@ -42,7 +42,7 @@ jobs:
         dotnet publish -c Release -o ./publish
         
     - name: Deploy to SmarterASP.NET
-      uses: sebastianpopp/msdeploy-action@releases/v1
+      uses: azure/webapps-deploy@v2
       with:
         website: 'itetech-001-site5'
         username: 'itetech-001'
