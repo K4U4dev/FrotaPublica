@@ -41,13 +41,22 @@ jobs:
         cd ${{env.work-directory}}
         dotnet publish -c Release -o ./publish
         
-    - name: Install Web Deploy (Optional)
-      run: choco install webdeploy -y  # Garante que o MSDeploy está instalado
+    - name: Install Web Deploy
+      run: |
+        choco install webdeploy -y --force
+        Get-ChildItem "${env:ProgramFiles}\IIS\Microsoft Web Deploy V3\msdeploy.exe"
+        Get-Command msdeploy
+
+    - name: Verify MSDeploy Path
+      run: |
+        $path1 = "${env:ProgramFiles}\IIS\Microsoft Web Deploy V3\msdeploy.exe"
+        $path2 = "${env:ProgramFiles(x86)}\IIS\Microsoft Web Deploy V3\msdeploy.exe"
+        
+        if (Test-Path $path1) { Write-Host "MSDeploy found in Program Files" }
+        elseif (Test-Path $path2) { Write-Host "MSDeploy found in Program Files (x86)" }
+        else { Write-Error "MSDeploy not found!" }
 
     - name: Deploy to SmarterASP.NET via MSDeploy
       run: |
         cd ${{env.work-directory}}
-        "C:\Program Files (x86)\IIS\Microsoft Web Deploy V3\msdeploy.exe" -verb:sync `
-          -source:contentPath='./publish' `
-          -dest:contentPath='frotaweb',ComputerName='https://win8184.site4now.net:8172/msdeploy.axd?site=itetech-001-site5',UserName='itetech-001',Password='${{ secrets.FTP_PASS_WEB }}',AuthType='Basic' `
-          -allowUntrusted  # Use se o certificado SSL não for confiável
+        & "${env:ProgramFiles}\IIS\Microsoft Web Deploy V3\msdeploy.exe" -verb:sync -source:contentPath='./publish' -dest:contentPath='frotaweb',ComputerName='https://win8184.site4now.net:8172/msdeploy.axd?site=itetech-001-site5',UserName='itetech-001',Password='${{ secrets.FTP_PASS_WEB }}',AuthType='Basic' -allowUntrusted
